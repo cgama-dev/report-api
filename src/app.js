@@ -4,7 +4,9 @@ import cors from 'cors'
 
 import routerReports from './routes/report-router'
 
+
 const app = express()
+const port = process.env.PORT || 8080
 
 app.use(bodyParser.json())
 app.use(bodyParser.urlencoded({
@@ -14,7 +16,7 @@ app.use(cors())
 
 app.use('/reports', routerReports())
 
-app.listen(3011, () => {
+app.listen(port, () => {
     console.log('Servidor rodando na porta 3011')
 })
 
