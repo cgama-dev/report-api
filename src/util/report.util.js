@@ -54,8 +54,8 @@ const UtilReport = () => {
 
             const pdf = await jsreport.render({
                 template: {
-                    content: page.toString(),
-                    helpers: helpers.toString(),
+                    content: page,
+                    helpers: helpers,
                     engine: 'handlebars',
                     recipe: 'phantom-pdf',
                     phantom: {
@@ -65,14 +65,14 @@ const UtilReport = () => {
                         numberOfWorkers: 1,
                         timeout: 180000,
                         allowLocalFilesAccess: false,
-                        header: header.toString(),
+                        header: header,
                         headerHeight: "3cm",
                         footer: footer.toString(),
                         footerHeight: "1cm"
                     }
 
                 },
-                data: data.toString()
+                data: data
             });
 
             const pdfData = pdf.content

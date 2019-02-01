@@ -8,6 +8,21 @@ const ReportSchema = new mongoose.Schema({
     url: {
         type: String
     },
+    data:{
+        type: String
+    },
+    helpers:{
+        type: String
+    },
+    footer:{
+        type: String
+    },
+    header:{
+        type: String
+    },
+    page:{
+        type: String
+    },
     createdAt: {
         type: Date,
         default: Date.now

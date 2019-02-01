@@ -20,7 +20,7 @@ const ReportController = () => {
 
         },
         get: async (req, res) => {
-            
+
             const id = req.params.id
 
             try {
@@ -29,22 +29,20 @@ const ReportController = () => {
                 })
 
                 if (!report)
-                    return res.status(400).send({ error: ' Erro ao buscar report' })
+                    return res.status(400).send({ message: 'Esse projeto não existe na base de dados', data: report })
 
-                const dir = path.resolve("./src/reports/" + report._id + '-' + report.url)
+                const newReport = {
+                    id: report.id,
+                    projectName: report.projectName,
+                    url: report.url,
+                    data: report.data,
+                    footer: report.footer,
+                    helpers: report.helpers,
+                    header: report.header,
+                    page: report.page
+                }
 
-                const Util = UtilReport()
-
-                const { data, footer, header, helpers, page } = await Util.readFile(dir)
-
-                return res.send({
-                    report,
-                    data,
-                    footer,
-                    header,
-                    helpers,
-                    page
-                })
+                return res.send(newReport)
 
             } catch (err) {
                 console.log(err)
@@ -54,27 +52,18 @@ const ReportController = () => {
         },
         create: async (req, res) => {
             try {
-                const report = await ReportModel.create(req.body)
 
-                const dir = path.resolve("./src/reports/" + report._id + '-' + report.url)
-
-                const defaultDir = path.resolve("./src/reports/default")
+                const dir = path.resolve("./src/reports/default")
 
                 const Util = UtilReport()
 
-                const { data, footer, header, helpers, page } = await Util.readFile(defaultDir)
+                const { data, footer, header, helpers, page } = await Util.readFile(dir)
 
-                const bodyPdf = {
-                    data: data,
-                    footer: footer,
-                    header: header,
-                    helpers: helpers,
-                    page: page
-                }
+                const report = { ...req.body, data, footer, header, helpers, page }
 
-                await Util.writeFile(dir, bodyPdf)
+                const reportSaved = await ReportModel.create(report)
 
-                return res.send(report)
+                return res.send(reportSaved)
 
             } catch (err) {
                 console.log(err)
@@ -92,22 +81,9 @@ const ReportController = () => {
                 if (!report)
                     return res.status(400).send({ error: 'Esse projeto não existe na base de dados' })
 
-                const Util = UtilReport()
+                const newReport = await ReportModel.findByIdAndUpdate(id, req.body, { new: true })
 
-                const dir = path.resolve("./src/reports/" + report._id + '-' + report.url)
-
-                await Util.writeFile(dir, req.body)
-
-                const { data, footer, header, helpers, page } = await Util.readFile(dir)
-
-                return res.send({
-                    report,
-                    data,
-                    footer,
-                    header,
-                    helpers,
-                    page
-                })
+                return res.send(newReport)
 
             } catch (err) {
 
@@ -115,12 +91,12 @@ const ReportController = () => {
             }
 
         },
-        generate: async(req, res) => {
+        generate: async (req, res) => {
 
             const id = req.body.reportId
 
             try {
-            
+
                 const report = await ReportModel.findOne({ _id: id })
 
                 if (!report)
@@ -128,7 +104,7 @@ const ReportController = () => {
 
                 const Util = UtilReport()
 
-                const pdfData  = await Util.generatePdf(req.body)
+                const pdfData = await Util.generatePdf(report)
 
                 res.writeHead(200, {
                     'Content-Type': 'application/pdf',
@@ -139,10 +115,30 @@ const ReportController = () => {
                 return res.end(pdfData)
 
             } catch (err) {
-                
+
                 return res.status(400).send({ error: 'Erro ao renderizar PDF' })
             }
-        }
+        },
+        destroy: async (req, res) => {
+
+            const id = req.params.id
+
+            try {
+
+                const report = await ReportModel.findByIdAndRemove({ _id: id })
+
+                if (!report)
+                    return res.status(400).send({ error: 'Esse projeto não existe na base de dados' })
+
+                return res.send({ message: 'Projeto deletado com sucesso' })
+
+            } catch (err) {
+
+                return res.status(400).send({ error: 'Ocorreu algum erro ao deletar esse projeto' })
+            }
+
+        },
+
     }
 
     return Report

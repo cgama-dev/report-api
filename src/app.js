@@ -17,7 +17,7 @@ app.use(cors())
 app.use('/reports', routerReports())
 
 app.listen(port, () => {
-    console.log('Servidor rodando na porta 3011')
+    console.log(`Servidor rodando na porta ${port}`)
 })
 
 export default app

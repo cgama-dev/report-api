@@ -13,6 +13,7 @@ const routeReport = () => {
     router.post('/', controller.create)
     router.post('/report/generate', controller.generate)
     router.put('/:id', controller.update)
+    router.delete('/:id', controller.destroy)
 
     return router
 }
